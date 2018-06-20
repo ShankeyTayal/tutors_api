@@ -1,0 +1,14 @@
+Flask==0.12.2
+Flask-RESTful==0.3.6
+Flask-SQLAlchemy==2.3.2
+Flask-Migrate==2.1.1
+marshmallow==2.15.0
+gunicorn==19.4.5
+PyYAML==3.12
+SQLAlchemy==1.2.0
+beautifulsoup4
+requests
+structlog==16.1.0
+IPy==0.83
+pyotp
+psycopg2==2.7.3.1
