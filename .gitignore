@@ -71,15 +71,9 @@ target/
 vagrantconfig.yml
 
 # secrets
-cart/secrets.py
-cart/secrets.stage.py
-cart/secrets.prod.py
-
-# internal_auth
-cart/internal_auth.json
-
-cart/interface/http/gunicorn.conf
-cart_api-virtualenv
+tutors_api/secrets.py
+tutors_api/secrets.stage.py
+tutors_api/secrets.prod.py
 
 .smartycfg
 
