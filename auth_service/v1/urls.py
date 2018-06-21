@@ -1,6 +1,8 @@
 from flask import Blueprint
 from flask_restful import Api
 from .views.otp import GenerateOTP
+from .views.token import GenerateToken
+from .views.logout import Logout
 from .views.health import HealthCheck
 from utils.log_utils import attach_logger
 
@@ -18,4 +20,6 @@ def before_each_request():
 
 
 api.add_resource(HealthCheck, '/health')
-api.add_resource(GenerateOTP, '/generateotp')
+api.add_resource(GenerateOTP, '/otp')
+api.add_resource(GenerateToken, '/token')
+api.add_resource(Logout, '/logout')

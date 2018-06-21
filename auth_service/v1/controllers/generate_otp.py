@@ -7,11 +7,10 @@ import datetime
 from auth_service.services.sms import send_sms
 from threading import Thread
 
-MAX_RETRY_COUNT = 3
 MAX_OTP_COUNT = 5
 
-REQUEST_OTP_DELAY = 15 * 60  # 15 mins
 OTP_EXPIRY_TIME = 3 * 60  # 3 mins
+REQUEST_OTP_DELAY = 15 * 60  # 15 mins
 
 MAX_RETRY_TEXT = "Max OTP limit has been reached."
 USER_BLOCKED_TEXT = "This user is blocked."
@@ -24,7 +23,7 @@ OTP_SMS = "OTP is {otp} to verify on Tutors"
 class GenerateOTPController(object):
     def __init__(self, data, metadata=None):
         self.phone = data.get('phone')
-        self.login_type = str(data.get('login_type'))
+        self.login_type = data.get('login_type')
         self.sign_up_ip = metadata.get('sign_up_ip')
         self.x_real_ip = metadata.get('x_real_ip')
 
@@ -52,8 +51,8 @@ class GenerateOTPController(object):
     def generate_otp(self):
         # Block users marked as blocked
         try:
-            self.user = User.get_or_create({'phone': self.phone,
-                                            'login_type': self.login_type})
+            self.user = User.get_or_create(
+                {'phone': self.phone, 'login_type': str(self.login_type)})
         except MultipleResultsFound as error:
             APIException(500, str(error))
 
@@ -106,3 +105,6 @@ class GenerateOTPController(object):
             'message': message,
         }
         return resp
+
+    def status(self, success):
+        return (201 if success else 200)

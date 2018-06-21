@@ -1,10 +1,9 @@
 import hashlib
 import random
-import json
-import datetime
 import pyotp
 import socket
 from IPy import IP
+from constants import OTP_LENGTH
 
 
 def get_client_ip(sign_up_ip, x_real_ip):
@@ -32,4 +31,10 @@ def public_ip_check(addr):
 
 
 def get_random_otp():
-    return pyotp.HOTP(pyotp.random_base32(), digits=4).at(0)
+    return pyotp.HOTP(pyotp.random_base32(), digits=OTP_LENGTH).at(0)
+
+
+def generate_access_token():
+    return hashlib.sha256(
+        str(random.SystemRandom().getrandbits(256)
+            ).encode('utf-8')).hexdigest()

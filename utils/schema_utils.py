@@ -1,8 +1,10 @@
 from flask import request, make_response
 import json
 from models import db
+from models.auth import AccessToken
 from marshmallow import ValidationError
 from .errors import APIException
+from functools import wraps
 
 
 class MultiItemTypeDict(dict):
@@ -108,7 +110,7 @@ class SchemaValidatorMixin(object):
                                          status=exc.status_code
                                          )
             return make_response(
-                json.dumps(exc.message), exc.status_code,
+                json.dumps(str(exc)), exc.status_code,
                 {'Content-Type': 'application/json'}
             )
         except ValidationError as error:
@@ -119,7 +121,7 @@ class SchemaValidatorMixin(object):
                                      status=400
                                      )
             return make_response(
-                json.dumps({'message': error.message}), 400,
+                json.dumps({'message': str(error)}), 400,
                 {'Content-Type': 'application/json'}
             )
         except Exception as error:
@@ -135,3 +137,22 @@ class SchemaValidatorMixin(object):
             )
         finally:
             db.session.close()
+
+
+def authorize():
+    '''A decorator that authenticates a user'''
+    def decorator(func):
+        @wraps(func)
+        def wrap(*args, **kwargs):
+            access_token = request.headers.get("access_token")
+            token_obj = AccessToken.get_token_obj({"token": access_token,
+                                                   "is_active": True})
+            if token_obj and token_obj.token == access_token:
+                return func(*args, **kwargs)
+
+            return make_response(
+                json.dumps({'message': "Unauthorized"}), 401,
+                {'Content-Type': 'application/json'}
+            )
+        return wrap
+    return decorator

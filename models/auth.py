@@ -47,19 +47,6 @@ class User(db.Model):
             return instance
 
 
-# class AuthOtpStatus(enum.Enum):
-#     otp_generated = 'OTP_GENERATED'
-#     otp_sent = 'OTP_SENT'
-#     otp_sending_failed = 'OTP_SENDING_FAILED'
-#     otp_verified = 'OTP_VERIFIED'
-#     otp_timed_out = 'OTP_TIMED_OUT'
-#     otp_auth_failed = 'OTP_AUTH_FAILED'
-
-#     @staticmethod
-#     def members():
-#         return [e.value for e in AuthOtpStatus]
-
-
 class AuthOtp(db.Model):
 
     __bind_key__ = 'default'
@@ -74,8 +61,6 @@ class AuthOtp(db.Model):
     update_ts = db.Column(db.DateTime(), default=datetime.datetime.now,
                           onupdate=datetime.datetime.now)
     expiry = db.Column(db.DateTime())
-    # status = db.Column(db.Enum(*AuthOtpStatus.members(),
-    #                            name="otp_status_type"), nullable=False)
     login_ip = db.Column(db.String(50))
     is_active = db.Column(db.Boolean, default=True)
 
@@ -102,6 +87,40 @@ class AuthOtp(db.Model):
     def update_otp_obj(self, *args, **kwargs):
         """
             Update otp properties
+        """
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        db.session.add(self)
+        db.session.commit()
+
+
+class AccessToken(db.Model):
+
+    __bind_key__ = 'default'
+    __tablename__ = 'access_token'
+
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.BigInteger, nullable=False)
+    token = db.Column(db.Text(), index=True)
+    created_ts = db.Column(db.DateTime(), default=datetime.datetime.now)
+    update_ts = db.Column(db.DateTime(), default=datetime.datetime.now,
+                          onupdate=datetime.datetime.now)
+    is_active = db.Column(db.Boolean, default=True)
+
+    @staticmethod
+    def get_token_obj(conditions_dict):
+        return AccessToken.query.filter_by(**conditions_dict).one_or_none()
+
+    @staticmethod
+    def create_token_obj(conditions_dict):
+        instance = AccessToken(**conditions_dict)
+        db.session.add(instance)
+        db.session.commit()
+        return instance
+
+    def update_token_obj(self, *args, **kwargs):
+        """
+            Update token properties
         """
         for key, value in kwargs.items():
             setattr(self, key, value)

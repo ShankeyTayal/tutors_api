@@ -1,0 +1,1 @@
+OTP_LENGTH = 4
